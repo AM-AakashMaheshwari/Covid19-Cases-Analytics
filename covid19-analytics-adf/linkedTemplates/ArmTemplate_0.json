@@ -125,7 +125,14 @@
 						"name": "Copy Population Data",
 						"description": "This activity will copy the population data from source to sink.",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Check If File Exists",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.00:10:00",
 							"retry": 0,
@@ -181,6 +188,23 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Check If File Exists",
+						"description": "This activity will check everyday if a new file has arrived.",
+						"type": "Validation",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "ds_population_raw_gz",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"timeout": "1.00:00:00",
+							"sleep": 600,
+							"minimumSize": 1024
+						}
 					}
 				],
 				"policy": {
