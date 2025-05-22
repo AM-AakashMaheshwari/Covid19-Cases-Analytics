@@ -1,0 +1,13 @@
+{
+	"name": "ls_adls_covidreportingdl",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "This linked service connects the ADF with the data lake gen2 storage where the transformed data will be stored",
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://covid19analyticsdatalake.dfs.core.windows.net/",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQEE0NUQzQ0MzLTVDRUMtNEEyNi1CRjNFLUQyN0VGMkRDQjFEOF8yNmM2YmJjMC1lZDc3LTRlZTQtYTE2YS0wYmM5MTc2YTkxNWUiDQp9"
+		}
+	}
+}
