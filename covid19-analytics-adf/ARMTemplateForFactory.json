@@ -36,7 +36,7 @@
 				"description": "This will ingest all the ECDC data using the HTTP protocol.",
 				"activities": [
 					{
-						"name": "Lookup ecdc data",
+						"name": "Lookup ecdc file list",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -51,17 +51,27 @@
 							"source": {
 								"type": "JsonSource",
 								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET"
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
 									"type": "JsonReadSettings"
 								}
 							},
 							"dataset": {
-								"referenceName": "ds_ecdc_file_list",
+								"referenceName": "ds_ecdc_files_list",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"sourceBasseURL": {
+										"value": "@variables('sourceURL')",
+										"type": "Expression"
+									},
+									"sourceRelativeURL": {
+										"value": "@variables('relativeURL')",
+										"type": "Expression"
+									}
+								}
 							},
 							"firstRowOnly": false
 						}
@@ -70,10 +80,18 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"variables": {
+					"relativeURL": {
+						"type": "String"
+					},
+					"sourceURL": {
+						"type": "String"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_ecdc_file_list')]"
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_files_list')]"
 			]
 		},
 		{
@@ -287,27 +305,35 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_ecdc_file_list')]",
+			"name": "[concat(parameters('factoryName'), '/ds_ecdc_files_list')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "This dataset contains the JSON file having all the source and sink URL links.",
 				"linkedServiceName": {
-					"referenceName": "ls_ablob_covidreportingsa_http",
-					"type": "LinkedServiceReference",
-					"parameters": {}
+					"referenceName": "ls_ablob_covidreportingsa",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"sourceBasseURL": {
+						"type": "string"
+					},
+					"sourceRelativeURL": {
+						"type": "string"
+					}
 				},
 				"annotations": [],
 				"type": "Json",
 				"typeProperties": {
 					"location": {
-						"type": "HttpServerLocation"
+						"type": "AzureBlobStorageLocation",
+						"fileName": "githubusercontent_ecdc_file_list.json",
+						"container": "ecdc-data"
 					}
 				},
 				"schema": {}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_ablob_covidreportingsa_http')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_ablob_covidreportingsa')]"
 			]
 		},
 		{
@@ -316,8 +342,53 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
+					"referenceName": "ls_adls_covidreportingdl",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"sinkFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().sinkFileName",
+							"type": "Expression"
+						},
+						"folderPath": "ecdc",
+						"fileSystem": "raw"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": false,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_covidreportingdl')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ecdc_raw_csv_http')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
 					"referenceName": "ls_ablob_covidreportingsa_http",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"sourceBaseURL": {
+						"type": "string"
+					},
+					"sourceRelativeURL": {
+						"type": "string"
+					}
 				},
 				"annotations": [],
 				"type": "DelimitedText",
@@ -327,7 +398,7 @@
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
-					"firstRowAsHeader": true,
+					"firstRowAsHeader": false,
 					"quoteChar": "\""
 				},
 				"schema": []
@@ -418,9 +489,6 @@
 				"parameters": {
 					"sourceBaseURL": {
 						"type": "string"
-					},
-					"sourceRelativeURL": {
-						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -450,6 +518,37 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tr_ingest_ecdc_data')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "This trigger will ingest all ecdc data",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingest_ecdc_data",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 10,
+						"startTime": "2025-05-24T13:10:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
+			]
 		}
 	]
 }
