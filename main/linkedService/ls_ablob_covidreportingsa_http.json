@@ -2,11 +2,6 @@
 	"name": "ls_ablob_covidreportingsa_http",
 	"properties": {
 		"description": "This linked service will connect the ecdc data from weblink and store it in the blob storage.  ",
-		"parameters": {
-			"sourceBaseURL": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "HttpServer",
 		"typeProperties": {
