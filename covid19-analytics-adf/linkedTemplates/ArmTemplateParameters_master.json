@@ -11,6 +11,9 @@
 		"ls_adls_covidreportingdl_accountKey": {
 			"value": ""
 		},
+		"ls_ablob_covidreportingsa_http_properties_typeProperties_url": {
+			"value": "@{linkedService().sourceBaseURL}"
+		},
 		"ls_adls_covidreportingdl_properties_typeProperties_url": {
 			"value": "https://covid19analyticsdatalake.dfs.core.windows.net/"
 		},
