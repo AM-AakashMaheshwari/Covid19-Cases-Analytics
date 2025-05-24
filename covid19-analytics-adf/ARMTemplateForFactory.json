@@ -36,7 +36,7 @@
 				"description": "This will ingest all the ECDC data using the HTTP protocol.",
 				"activities": [
 					{
-						"name": "Lookup ecdc file list",
+						"name": "Look up each ecdc data",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -62,18 +62,103 @@
 							"dataset": {
 								"referenceName": "ds_ecdc_files_list",
 								"type": "DatasetReference",
-								"parameters": {
-									"sourceBasseURL": {
-										"value": "@variables('sourceURL')",
-										"type": "Expression"
-									},
-									"sourceRelativeURL": {
-										"value": "@variables('relativeURL')",
-										"type": "Expression"
-									}
-								}
+								"parameters": {}
 							},
 							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "For each data source",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Look up each ecdc data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Look up each ecdc data').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy data",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_ecdc_raw_csv_http",
+											"type": "DatasetReference",
+											"parameters": {
+												"relativeURL": {
+													"value": "@item().sourceRelativeURL",
+													"type": "Expression"
+												},
+												"baseURL": {
+													"value": "@item().sourceBaseURL",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_ecdc_raw_csv_dl",
+											"type": "DatasetReference",
+											"parameters": {
+												"sinkFileName": {
+													"value": "@item().sinkFileName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
 						}
 					}
 				],
@@ -91,7 +176,9 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_ecdc_files_list')]"
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_files_list')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_http')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_dl')]"
 			]
 		},
 		{
@@ -313,14 +400,6 @@
 					"referenceName": "ls_ablob_covidreportingsa",
 					"type": "LinkedServiceReference"
 				},
-				"parameters": {
-					"sourceBasseURL": {
-						"type": "string"
-					},
-					"sourceRelativeURL": {
-						"type": "string"
-					}
-				},
 				"annotations": [],
 				"type": "Json",
 				"typeProperties": {
@@ -380,13 +459,19 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "ls_ablob_covidreportingsa_http",
-					"type": "LinkedServiceReference"
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"sourceBaseURL": {
+							"value": "@dataset().baseURL",
+							"type": "Expression"
+						}
+					}
 				},
 				"parameters": {
-					"sourceBaseURL": {
+					"relativeURL": {
 						"type": "string"
 					},
-					"sourceRelativeURL": {
+					"baseURL": {
 						"type": "string"
 					}
 				},
@@ -394,11 +479,15 @@
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
-						"type": "HttpServerLocation"
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().relativeURL",
+							"type": "Expression"
+						}
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
-					"firstRowAsHeader": false,
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": []
@@ -541,7 +630,7 @@
 					"recurrence": {
 						"frequency": "Minute",
 						"interval": 10,
-						"startTime": "2025-05-24T13:10:00",
+						"startTime": "2025-05-24T17:02:00",
 						"timeZone": "India Standard Time"
 					}
 				}
