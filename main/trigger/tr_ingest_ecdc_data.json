@@ -3,7 +3,7 @@
 	"properties": {
 		"description": "This trigger will ingest all ecdc data",
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipelines": [
 			{
 				"pipelineReference": {
