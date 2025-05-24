@@ -3,13 +3,19 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_ablob_covidreportingsa_http",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"sourceBaseURL": {
+					"value": "@dataset().baseURL",
+					"type": "Expression"
+				}
+			}
 		},
 		"parameters": {
-			"sourceBaseURL": {
+			"relativeURL": {
 				"type": "string"
 			},
-			"sourceRelativeURL": {
+			"baseURL": {
 				"type": "string"
 			}
 		},
@@ -17,11 +23,15 @@
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "HttpServerLocation"
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().relativeURL",
+					"type": "Expression"
+				}
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
-			"firstRowAsHeader": false,
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": []

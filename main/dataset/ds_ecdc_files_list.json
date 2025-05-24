@@ -5,14 +5,6 @@
 			"referenceName": "ls_ablob_covidreportingsa",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"sourceBasseURL": {
-				"type": "string"
-			},
-			"sourceRelativeURL": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {

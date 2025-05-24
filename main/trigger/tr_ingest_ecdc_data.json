@@ -9,9 +9,6 @@
 				"pipelineReference": {
 					"referenceName": "pl_ingest_ecdc_data",
 					"type": "PipelineReference"
-				},
-				"parameters": {
-					"sourceBaseURL": "https://raw.githubusercontent.com"
 				}
 			}
 		],
@@ -20,7 +17,7 @@
 			"recurrence": {
 				"frequency": "Minute",
 				"interval": 10,
-				"startTime": "2025-05-24T13:10:00",
+				"startTime": "2025-05-24T17:02:00",
 				"timeZone": "India Standard Time"
 			}
 		}
