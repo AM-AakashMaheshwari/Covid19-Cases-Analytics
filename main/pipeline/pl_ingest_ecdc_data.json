@@ -29,7 +29,17 @@
 					},
 					"dataset": {
 						"referenceName": "ds_ecdc_files_list",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"sourceBasseURL": {
+								"value": "@variables('sourceURL')",
+								"type": "Expression"
+							},
+							"sourceRelativeURL": {
+								"value": "@variables('relativeURL')",
+								"type": "Expression"
+							}
+						}
 					},
 					"firstRowOnly": false
 				}
@@ -113,13 +123,11 @@
 				}
 			}
 		],
-		"parameters": {
-			"sourceBaseURL": {
-				"type": "String"
-			}
-		},
 		"variables": {
 			"relativeURL": {
+				"type": "String"
+			},
+			"sourceURL": {
 				"type": "String"
 			}
 		},
