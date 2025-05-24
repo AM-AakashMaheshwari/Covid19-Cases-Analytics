@@ -8,6 +8,9 @@
 			},
 			"sourceRelativeURL": {
 				"type": "string"
+			},
+			"sinkFileName": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
