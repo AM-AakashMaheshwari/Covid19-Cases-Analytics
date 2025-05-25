@@ -76,7 +76,7 @@
 					},
 					"ifFalseActivities": [
 						{
-							"name": "Fail1",
+							"name": "Failed Message",
 							"type": "Fail",
 							"dependsOn": [],
 							"userProperties": [],
