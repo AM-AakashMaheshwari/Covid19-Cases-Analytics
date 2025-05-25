@@ -1,0 +1,26 @@
+{
+	"name": "tr_ingest_ecdc_data",
+	"properties": {
+		"description": "This trigger will ingest all ecdc data",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingest_ecdc_data",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2025-05-24T17:02:00",
+				"endTime": "2025-05-25T11:57:50",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}
