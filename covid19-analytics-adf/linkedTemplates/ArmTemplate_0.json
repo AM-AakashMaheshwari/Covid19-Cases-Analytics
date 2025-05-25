@@ -726,7 +726,8 @@
 						"type": "String"
 					}
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2025-05-24T11:30:30Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ecdc_files_list')]",
@@ -816,7 +817,7 @@
 							},
 							"ifFalseActivities": [
 								{
-									"name": "Fail1",
+									"name": "Failed Message",
 									"type": "Fail",
 									"dependsOn": [],
 									"userProperties": [],
@@ -936,7 +937,8 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2025-05-23T06:24:15Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_population_raw_gz')]",
@@ -1362,7 +1364,8 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2025-05-24T19:39:19Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/df_raw_cases_and_deaths')]"
